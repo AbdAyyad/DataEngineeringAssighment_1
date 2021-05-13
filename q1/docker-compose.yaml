@@ -1,0 +1,59 @@
+version: "3.7"
+services:
+  nifi:
+    container_name: nifi
+    image: apache/nifi
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    restart: always
+    environment:
+      - NIFI_WEB_HTTP_HOST=0.0.0.0
+      - NIFI_JVM_HEAP_INIT=4g
+      - NIFI_JVM_HEAP_MAX=6g
+      - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/env.properties
+    volumes:
+      - nifi_data:/opt/nifi/nifi-current/
+      - ./nifi/extensions:/opt/nifi/nifi-current/extensions
+      - ./nifi/conf:/opt/nifi/nifi-current/conf
+
+  nifi-registry:
+    container_name: nifi-registry
+    image: apache/nifi-registry
+    ports:
+      - target: 18080
+        published: 18080
+        protocol: tcp
+        mode: host
+    environment:
+      - NIFI_REGISTRY_WEB_HTTP_HOST=0.0.0.0
+      - JVM_OPTS=-Xmx512m -Xms512m -XX:MaxPermSize=1g
+    volumes:
+      - ./registry/providers.xml:/opt/nifi-registry/nifi-registry-current/conf/providers.xml
+      - ./registry/flow-storage:/opt/nifi-registry/nifi-registry-current/flow_storage
+      - ./registry/database:/opt/nifi-registry/nifi-registry-current/database
+  mongo:
+    container_name: de_mongo
+    image: 'mongo'
+    ports:
+    - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+  de_postgres:
+    container_name: de_postgres
+    image: 'postgres:13.2'
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+volumes:
+  nifi_data:
+    external: true
+networks:
+  default:
+    external:
+      name: nifi-network
