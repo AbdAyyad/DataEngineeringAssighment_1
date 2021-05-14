@@ -4,7 +4,7 @@ docker stop "$(docker ps -q)" || true
 docker network create nifi-network || true
 docker volume create --name=nifi_data || true
 
-sudo docker-compose up -d
+docker-compose up -d
 
 sleep 5
 
