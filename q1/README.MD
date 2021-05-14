@@ -42,6 +42,4 @@ to access postgresql
 
 to access mongoDB
 <br/>
-connection string `mongodb://mongoadmin:mongo@de_mongo:27017`
-
-
+connection string `mongodb://mongoadmin:mongo@localhost:27017`
